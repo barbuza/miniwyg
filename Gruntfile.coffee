@@ -17,7 +17,7 @@ module.exports = (grunt) ->
         ]
       release:
         files:
-          "release/miniwyg.html": "build/index.html"
+          "release/miniwyg.html": "build/miniwyg.html"
 
     parallel:
       server:
