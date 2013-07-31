@@ -1,8 +1,10 @@
 <html>
   <head>
-    <link rel='stylesheet' href='miniwyg.min.css'>
-    <script src='http://code.jquery.com/jquery-2.0.3.min.js'></script>
-    <script src='miniwyg.min.js'></script>
+    <title>miniwyg demo</title>
+    <link rel='stylesheet' href='miniwyg.css'>
+    <link rel='stylesheet' href='//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css'>
+    <script src='//code.jquery.com/jquery-2.0.3.min.js'></script>
+    <script src='miniwyg.js'></script>
     <style>
       body {
         padding: 100px;
@@ -10,13 +12,21 @@
     </style>
   </head>
   <body>
+    basic
     <form>
-      <div class='row'>
-        <textarea name='some' role='miniwyg' cols='80' rows='5'>initial text</textarea>
-      </div>
-      <div class='row'>
-        <input type='submit'>
-      </div>
+      <textarea name='foo' rows='5' cols='80' role='miniwyg'>foo&lt;br>
+      bar&lt;br>
+      spam&lt;br>
+      eggs&lt;br></textarea>
+      <input type='submit'>
+    </form>
+    fontawesome
+    <form>
+      <textarea name='foo' rows='5' cols='80' role='miniwyg_fontawesome'>foo&lt;br>
+      bar&lt;br>
+      spam&lt;br>
+      eggs&lt;br></textarea>
+      <input type='submit'>
     </form>
   </body>
 </html>
