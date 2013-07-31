@@ -2,7 +2,7 @@
 deffer = (fun) -> setTimeout fun, 0
 
 
-create_miniwyg = ->
+create_miniwyg = (options={}) ->
   unless @data "miniwyg"
 
     document.execCommand "defaultParagraphSeparator", no, "p"
@@ -15,6 +15,8 @@ create_miniwyg = ->
     """
 
     panel = miniwyg.find ".panel:first"
+    if options.fontawesome
+      panel.addClass "fontawesome"
 
     editor = miniwyg.find ".editor:first"
     editor.css "min-height", @height()
@@ -23,9 +25,13 @@ create_miniwyg = ->
     for command in ["bold", "italic", "underline"]
       do (command) ->
         tagname = command.charAt 0
-        panel.append "<#{tagname}>#{tagname}</#{tagname}>"
+        btn = if options.fontawesome
+          jQuery "<span class='icon-#{command}'></span>"
+        else
+          jQuery "<#{tagname}>#{tagname}</#{tagname}>"
+        panel.append btn
         charcode = tagname.toUpperCase().charCodeAt 0
-        panel.find(tagname).mousedown -> document.execCommand command, no, null
+        btn.mousedown -> document.execCommand command, no, null
         editor.keydown (e) ->
           if e.keyCode is charcode and e.metaKey
             document.execCommand command, no, null
@@ -85,13 +91,17 @@ destroy_miniwyg = ->
 
 
 jQuery.fn.miniwyg = (command) ->
-  fn = switch command
+  {fn, args} = switch command
     when "destroy"
-      destroy_miniwyg
+      {fn: destroy_miniwyg}
+    when "fontawesome"
+      {fn: create_miniwyg, args: [fontawesome: yes]}
     else
-      create_miniwyg
-  fn.apply jQuery el for el in @
+      {fn: create_miniwyg}
+  fn.apply(jQuery(el), args or []) for el in @
   @
 
 
-jQuery ($) -> $("textarea[role=miniwyg]").miniwyg()
+jQuery ($) ->
+  $("textarea[role=miniwyg]").miniwyg()
+  $("textarea[role=miniwyg_fontawesome]").miniwyg("fontawesome")
