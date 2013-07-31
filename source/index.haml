@@ -1,0 +1,17 @@
+%html
+  %head
+    %link( rel="stylesheet" href="miniwyg.css" )
+    %script( src="jquery.js" )
+    %script( src="miniwyg.js" )
+    :css
+      body {
+        padding: 40px;
+      }
+  %body
+    %form
+      %textarea( name="foo" rows="5" cols="80" role="miniwyg" )
+        foo&lt;br>
+        bar&lt;br>
+        spam&lt;br>
+        eggs&lt;br>
+      %input( type="submit" )

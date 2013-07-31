@@ -1,0 +1,41 @@
+.miniwyg
+  position relative
+
+  .editor
+    position relative
+    background #fff
+    border 1px solid #ccc
+    padding 2px 4px
+    z-index 200
+
+  .panel
+    z-index 100
+    opacity 0
+    transition opacity .2s, transform .2s
+    transform translateY(24px)
+    display none
+    &.display
+      display block
+    &.show
+      opacity 1
+      transform translateY(0px)
+    background #ccc
+    border-top-left-radius 2px
+    border-top-right-radius 2px
+    font-size 20px
+    font-family Arial
+    position absolute
+    top -24px
+    u, b, i
+      display inline-block
+      text-align center
+      width 24px
+      line-height 24px
+      cursor pointer
+      border-radius 2px
+      &:active, &:hover
+        background #000
+        color #fff
+
+.miniwyg_hidden_textarea
+  display none
