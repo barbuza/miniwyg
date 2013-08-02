@@ -13,6 +13,7 @@
     "grunt-contrib-cssmin": "~0.6.1",
     "grunt-autoprefixer": "~0.2.20130718",
     "grunt-haml": "~0.5.0",
-    "grunt-parallel": "~0.2.0"
+    "grunt-parallel": "~0.2.0",
+    "grunt-livescript": "~0.5.0"
   }
 }

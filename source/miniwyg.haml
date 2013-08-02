@@ -1,32 +1,30 @@
-<html>
-  <head>
-    <title>miniwyg demo</title>
-    <link rel='stylesheet' href='miniwyg.min.css'>
-    <link rel='stylesheet' href='//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css'>
-    <script src='//code.jquery.com/jquery-2.0.3.min.js'></script>
-    <script src='miniwyg.min.js'></script>
-    <style>
+%html
+  %head
+    %title miniwyg demo
+    %link( rel="stylesheet" href="miniwyg.min.css" )
+    %link( rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" )
+    %script( src="http://code.jquery.com/jquery-2.0.3.min.js" )
+    %script( src="miniwyg.min.js" )
+    :css
       body {
         padding: 100px;
       }
-    </style>
-  </head>
-  <body>
+  %body
+
     basic
-    <form>
-      <textarea name='foo' rows='5' cols='80' role='miniwyg'>foo&lt;br>
-      bar&lt;br>
-      spam&lt;br>
-      eggs&lt;br></textarea>
-      <input type='submit'>
-    </form>
+    %form
+      %textarea( name="foo" rows="5" cols="80" role="miniwyg" )
+        foo&lt;br>
+        bar&lt;br>
+        spam&lt;br>
+        eggs&lt;br>
+      %input( type="submit" )
+
     fontawesome
-    <form>
-      <textarea name='foo' rows='5' cols='80' role='miniwyg_fontawesome'>foo&lt;br>
-      bar&lt;br>
-      spam&lt;br>
-      eggs&lt;br></textarea>
-      <input type='submit'>
-    </form>
-  </body>
-</html>
+    %form
+      %textarea( name="foo" rows="5" cols="80" role="miniwyg" miniwyg-style="fontawesome" )
+        foo&lt;br>
+        bar&lt;br>
+        spam&lt;br>
+        eggs&lt;br>
+      %input( type="submit" )

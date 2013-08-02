@@ -11,7 +11,7 @@ module.exports = (grunt) ->
           expand: true
           cwd: "source"
           matchBase: true
-          src: ["*.*", "!*.styl", "!*.haml", "!*.coffee"]
+          src: ["*.*", "!*.styl", "!*.haml", "!*.ls"]
           dest: "build"
           filter: "isFile"
         ]
@@ -34,9 +34,9 @@ module.exports = (grunt) ->
           keepalive: true
 
     watch:
-      coffee:
-        files: ["source/**/*.coffee"]
-        tasks: ["coffee"]
+      livescript:
+        files: ["source/**/*.ls"]
+        tasks: ["livescript"]
         options:
           livereload: true
 
@@ -58,7 +58,7 @@ module.exports = (grunt) ->
         options:
           livereload: true
 
-    coffee:
+    livescript:
       options:
         sourceMap: yes
 
@@ -67,7 +67,7 @@ module.exports = (grunt) ->
           expand: true
           cwd: "source"
           matchBase: true
-          src: ["*.coffee"]
+          src: ["*.ls"]
           dest: "build"
           ext: ".js"
         ]
@@ -124,7 +124,7 @@ module.exports = (grunt) ->
           expand: true
           cwd: "source"
           matchBase: true
-          src: ["*.haml", "!templates/**/*.haml"]
+          src: ["*.haml"]
           dest: "build"
           ext: ".html"
         ]
@@ -132,25 +132,11 @@ module.exports = (grunt) ->
           target: "html"
           language: "coffee"
 
-      templates:
-        files: [
-          expand: true
-          cwd: "source/templates"
-          matchBase: true
-          src: "*.haml"
-          dest: "build/templates"
-          ext: ".js"
-        ]
-        options:
-          target: "js"
-          language: "coffee"
-          namespace: "window.templates"
-          bare: false
 
   require("fs").readdirSync("node_modules").forEach (name) ->
     grunt.loadNpmTasks name  if /^grunt-/.test(name)
 
   grunt.registerTask "server", ["parallel:server"]
-  grunt.registerTask "build", ["copy:static", "stylus", "autoprefixer", "coffee", "haml"]
+  grunt.registerTask "build", ["copy:static", "stylus", "autoprefixer", "livescript", "haml"]
   grunt.registerTask "export", ["clean", "build", "cssmin", "uglify", "copy:release"]
   grunt.registerTask "default", ["clean", "build", "server"]
