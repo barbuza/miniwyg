@@ -1,4 +1,4 @@
-$ = require "jquery-browserify"
+$ = require \jquery2
 
 module.exports = !(cb)->
   html = $ "<input type='file'>"

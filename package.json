@@ -17,6 +17,8 @@
     "browserify": "~3.2.2",
     "grunt-browserify": "~1.3.0",
     "liveify": "~0.3.1",
-    "jquery-browserify": "~1.8.1"
+    "jquery2": "~2.0.3-a",
+    "hbsfy": "~1.0.0",
+    "prelude-ls": "~1.0.3"
   }
 }

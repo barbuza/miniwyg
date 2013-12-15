@@ -1,9 +1,20 @@
-$ = require \jquery-browserify
+$ = require \jquery2
 URI = require \url
-resize-image = require "./resize-image.ls"
-get-image = require "./get-image.ls"
+resize-image = require "./miniwyg/resize-image.ls"
+get-image = require "./miniwyg/get-image.ls"
+{each, flip, map} = require "prelude-ls"
 
+foreach = flip each
+delay = flip set-timeout
 deffer = !(fun) -> set-timeout fun, 0
+
+in-heading = (selector = "h1, h2, h3") ->
+  parent = window.get-selection!?focus-node?.parent-node
+  if parent
+    node = $(parent)
+    node.is(selector) or node.parents(selector).length
+  else
+    no
 
 create-miniwyg = !({fontawesome}:options={}) ->
   unless @data \miniwyg
@@ -12,38 +23,12 @@ create-miniwyg = !({fontawesome}:options={}) ->
 
     document.exec-command \defaultParagraphSeparator, no, \p
 
-    miniwyg = $ """
-      <div class="miniwyg">
-        <div class="editor" contenteditable spellcheck="false"></div>
-        <div class="bottom"></div>
-      </div>
-    """
-
-    panel = $ """
-      <div class="miniwyg-panel"></div>
-    """
-
-    image-panel = $ """
-      <div class="miniwyg-panel miniwyg-panel-image">
-        <span class="fa fa-align-left"></span>
-        <span class="fa fa-align-center"></span>
-        <span class="fa fa-align-right"></span>
-        <span class="fa fa-eraser"></span>
-      </div>
-    """
-
-    video-panel = $ """
-      <div class="miniwyg-panel miniwyg-panel-video">
-        <span class="fa fa-eraser"></span>
-      </div>      
-    """
-
-    insert-panel = $ """
-      <div class="miniwyg-insert-popup">
-        <span class="fa fa-camera-retro"></span>
-        <span class="fa fa-video-camera"></span>
-      </div>
-    """
+    miniwyg = $ require("./miniwyg/templates/miniwyg.hbs")!
+    panel = $ require("./miniwyg/templates/panel.hbs")!
+    image-panel = $ require("./miniwyg/templates/image-panel.hbs")!
+    video-panel = $ require("./miniwyg/templates/video-panel.hbs")!
+    insert-panel = $ require("./miniwyg/templates/insert-panel.hbs")!
+    @data \miniwyg-panels [panel, image-panel, video-panel, insert-panel]
 
     $(document.body).append panel, image-panel, video-panel, insert-panel
 
@@ -56,34 +41,22 @@ create-miniwyg = !({fontawesome}:options={}) ->
     editor.css \min-height, @height!
     editor.html @text!
 
-    in-heading = (selector = "h1, h2, h3") ->
-      parent = window.get-selection!?focus-node?.parent-node
-      if parent
-        node = $(parent)
-        node.is(selector) or node.parents(selector).length
-      else
-        no
+    foreach <[bold italic underline]> !(command) ->
+      charcode = command.char-at(0).to-upper-case!
+      btn = panel.find(".fa-#command")
 
-    $.each <[bold italic underline]> !(_, command) ->
-      tagname = command.char-at 0
-      btn = if fontawesome
-        $ "<span class='fa fa-#command'></span>"
-      else
-        $ "<#tagname>#tagname</#tagname>"
-      panel.append btn
-      charcode = tagname.to-upper-case!char-code-at 0
       btn.mousedown ->
         if command isnt \bold or not in-heading!
           document.exec-command command, no, null
         no
+
       editor.keydown !(e) ->
         if command isnt \bold or not in-heading!
           if e.key-code is charcode and e.meta-key
             document.exec-command command, no, null
 
-    $.each <[h1 h2 h3]> !(_, tagname) ->
-      btn = $ "<span>#tagname</span>"
-      panel.append btn
+    foreach <[h1 h2 h3]> !(tagname) ->
+      btn = panel.find("[data-tag=#tagname]")
       btn.mousedown ->
         document.exec-command \formatBlock, no, if in-heading(tagname) then \p else tagname
         no
@@ -122,8 +95,7 @@ create-miniwyg = !({fontawesome}:options={}) ->
       remove-linebreaks!
       remove-spans!
 
-    $.each [panel, image-panel, video-panel, insert-panel] (_, panel) ->
-
+    foreach [panel, image-panel, video-panel, insert-panel] (panel) ->
       panel.on \transitionend !->
         panel.remove-class(\display) unless panel.has-class \show
 
@@ -153,10 +125,12 @@ create-miniwyg = !({fontawesome}:options={}) ->
       make-insert-selection.apply @
       get-image !(img) ~>
         url = resize-image(img, 700, 300)
-        document.exec-command \insertHtml no "<img class='center' src='#url'>"
+        document.exec-command \insertHtml no require("./miniwyg/templates/image.hbs")({url})
         make-start-selection.apply @
         deffer move-images
         deffer remove-linebreaks
+
+    video-template = require("./miniwyg/templates/video.hbs")
 
     insert-video = ->
       make-insert-selection.apply @
@@ -168,7 +142,7 @@ create-miniwyg = !({fontawesome}:options={}) ->
           vimeo-id = uri.path.slice(1)
           load-vimeo-cover vimeo-id, !(img) ~>
             url = resize-image img, 700, 300, \vimeo
-            document.exec-command \insertHtml no "<img class='video' src='#url' data-source='vimeo' data-id='#vimeo-id'>"
+            document.exec-command \insertHtml no video-template({url, source: \vimeo, id: vimeo-id})
             make-start-selection.apply @
             deffer move-images
             deffer remove-linebreaks
@@ -176,7 +150,7 @@ create-miniwyg = !({fontawesome}:options={}) ->
         youtube-id = uri.query?.v
         load-youtube-cover youtube-id, !(img) ~>
           url = resize-image img, 700, 300, \youtube
-          document.exec-command \insertHtml no "<img class='video' src='#url' data-source='youtube' data-id='#youtube-id'>"
+          document.exec-command \insertHtml no video-template({url, source: \youtube, id: youtube-id})
           make-start-selection.apply @
           deffer move-images
           deffer remove-linebreaks
@@ -239,7 +213,7 @@ create-miniwyg = !({fontawesome}:options={}) ->
         image-panel.css img.offset()
         image-panel.add-class \display
         image-panel.find(".fa-eraser").unbind(\click).bind \click !-> img.remove!
-        $.each <[left right center]> !(_, command) ->
+        foreach <[left right center]> !(command) ->
           image-panel.find(".fa-align-#command").unbind(\click).bind \click !-> img.attr \class command
         deffer !-> image-panel.add-class \show
 
@@ -260,8 +234,10 @@ create-miniwyg = !({fontawesome}:options={}) ->
 
       editor.on \mouseenter "img.video" !->
         over-video := yes
-        video-panel.css $(@).offset()
+        video = $(@)
+        video-panel.css video.offset()
         video-panel.add-class \display
+        video-panel.find(".fa-eraser").unbind(\click).bind \click !-> video.remove!
         deffer !-> video-panel.add-class \show
 
       editor.on \mouseleave "img.video" !->
@@ -280,36 +256,37 @@ create-miniwyg = !({fontawesome}:options={}) ->
 
     bind = !(target, name, fn) ->
       $(target).bind name, fn
-      unbinds.push !-> $(target).unbind name, fn
+      unbinds.push !-> $(target).unbind(name, fn)
 
     bind form, \submit update-textarea
     bind document.body, \mousedown hide-panel
 
-    miniwyg.data \unbinds, unbinds
-    @data \miniwyg, miniwyg
+    miniwyg.data \unbinds unbinds
+    @data \miniwyg miniwyg
     @add-class \miniwyg-hidden-textarea
     @after miniwyg
 
     if @data(\miniwyg-focus)
-      if editor.children()
-        child = editor.children()[0]
-        sel = window.get-selection!
-        sel.remove-all-ranges!
-        range = document.create-range!
-        range.set-start child, 0
-        range.set-end child, 0
-        sel.add-range range
+      unless editor.children().length
+        editor.append document.create-element(\p)
+      child = editor.children()[0]
+      make-start-selection.apply child
       editor.focus!
 
     check-selection!
 
 
 destroy-miniwyg = !->
+  panels = @data \miniwyg-panels
+  @data \miniwyg-panels null
+  if panels
+    each (.remove!), panels
   miniwyg = @data \miniwyg
   if miniwyg
-    $.each miniwyg.data(\unbinds), !(_, fn) -> fn!
+    each (.apply!), miniwyg.data(\unbinds)
+    @html miniwyg.find(".editor").html()
     miniwyg.remove!
-    @data \miniwyg, null
+    @data \miniwyg null
     @remove-class \miniwyg-hidden-textarea
 
 $.fn.miniwyg = (command) ->
@@ -317,7 +294,7 @@ $.fn.miniwyg = (command) ->
   | \destroy => destroy-miniwyg
   | \fontawesome => !-> create-miniwyg {+fontawesome}
   | otherwise => create-miniwyg
-  @each !(_, el) -> call.apply $(el)
+  foreach @, (el) -> call.apply $(el)
   @
 
 $.fn.miniwyg-val = ->
@@ -325,3 +302,5 @@ $.fn.miniwyg-val = ->
   miniwyg.find(\.editor:first).html! if miniwyg
 
 $ !-> $("textarea[role=miniwyg]").miniwyg!
+
+window.$ = $

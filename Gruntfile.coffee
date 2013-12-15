@@ -11,7 +11,7 @@ module.exports = (grunt) ->
           expand: true
           cwd: "source"
           matchBase: true
-          src: ["*.*", "!*.styl", "!*.haml", "!*.ls"]
+          src: ["*.*", "!*.styl", "!*.haml", "!*.ls", "!*.hbs"]
           dest: "build"
           filter: "isFile"
         ]
@@ -29,13 +29,14 @@ module.exports = (grunt) ->
     connect:
       server:
         options:
+          hostname: "*"
           port: 5678
           base: "build"
           keepalive: true
 
     watch:
-      livescript:
-        files: ["source/**/*.ls"]
+      javascripts:
+        files: ["source/**/*.ls", "source/**/*.hbs"]
         tasks: ["browserify"]
         options:
           livereload: true
@@ -107,17 +108,6 @@ module.exports = (grunt) ->
           ext: ".min.css"
         ]
 
-    uglify:
-      compile:
-        files: [
-          expand: true
-          matchBase: true
-          cwd: "build"
-          src: ["*.js", "!jquery.js"]
-          dest: "release"
-          ext: ".min.js"
-        ]
-
     haml:
       html:
         files: [
@@ -133,17 +123,26 @@ module.exports = (grunt) ->
           language: "coffee"
 
     browserify:
+      options:
+        transform: ["liveify", "hbsfy"]
+      dev:
+        options:
+          debug: yes
+        files:
+          "build/miniwyg.debug.js": ["source/miniwyg.ls"]
       dist:
         files:
           "build/miniwyg.js": ["source/miniwyg.ls"]
-        options:
-          debug: yes
-          transform: ["liveify"]
+
+    uglify:
+      dist:
+        files:
+          "build/miniwyg.min.js": ["build/miniwyg.js"]
 
   require("fs").readdirSync("node_modules").forEach (name) ->
     grunt.loadNpmTasks name  if /^grunt-/.test(name)
 
   grunt.registerTask "server", ["parallel:server"]
-  grunt.registerTask "build", ["copy:static", "stylus", "autoprefixer", "browserify", "haml"]
-  grunt.registerTask "export", ["clean", "build", "cssmin", "uglify", "copy:release"]
+  grunt.registerTask "build", ["copy:static", "stylus", "autoprefixer", "browserify:dev", "haml"]
+  grunt.registerTask "export", ["clean", "build", "browserify:dist", "cssmin", "uglify", "copy:release"]
   grunt.registerTask "default", ["clean", "build", "server"]
