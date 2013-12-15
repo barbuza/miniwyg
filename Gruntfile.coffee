@@ -36,7 +36,7 @@ module.exports = (grunt) ->
     watch:
       livescript:
         files: ["source/**/*.ls"]
-        tasks: ["livescript"]
+        tasks: ["browserify"]
         options:
           livereload: true
 
@@ -132,11 +132,18 @@ module.exports = (grunt) ->
           target: "html"
           language: "coffee"
 
+    browserify:
+      dist:
+        files:
+          "build/miniwyg.js": ["source/miniwyg.ls"]
+        options:
+          debug: yes
+          transform: ["liveify"]
 
   require("fs").readdirSync("node_modules").forEach (name) ->
     grunt.loadNpmTasks name  if /^grunt-/.test(name)
 
   grunt.registerTask "server", ["parallel:server"]
-  grunt.registerTask "build", ["copy:static", "stylus", "autoprefixer", "livescript", "haml"]
+  grunt.registerTask "build", ["copy:static", "stylus", "autoprefixer", "browserify", "haml"]
   grunt.registerTask "export", ["clean", "build", "cssmin", "uglify", "copy:release"]
   grunt.registerTask "default", ["clean", "build", "server"]

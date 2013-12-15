@@ -1,30 +1,19 @@
+<!doctype html>
 %html
   %head
     %title miniwyg demo
+    %link( rel="stylesheet" href="http://fonts.googleapis.com/css?family=Exo+2:300,600,300italic,600italic&subset=latin,cyrillic" type="text/css" )
     %link( rel="stylesheet" href="miniwyg.css" )
-    %link( rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" )
-    %script( src="http://code.jquery.com/jquery-2.0.3.min.js" )
+    %link( rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" )
     %script( src="miniwyg.js" )
     :css
       body {
-        padding: 100px;
+        padding: 50px;
       }
   %body
-
-    basic
     %form
-      %textarea( name="foo" rows="5" cols="80" role="miniwyg" )
-        foo&lt;br>
-        bar&lt;br>
-        spam&lt;br>
-        eggs&lt;br>
-      %input( type="submit" )
-
-    fontawesome
-    %form
-      %textarea( name="foo" rows="5" cols="80" role="miniwyg" miniwyg-style="fontawesome" )
-        foo&lt;br>
-        bar&lt;br>
-        spam&lt;br>
-        eggs&lt;br>
-      %input( type="submit" )
+      %textarea( name="foo" rows="5" cols="180" role="miniwyg" data-miniwyg-style="fontawesome" data-miniwyg-focus="true" data-miniwyg-image-loader="http://127.0.0.1:8899/image-loader" )
+        %p foo
+        %p bar
+        %img( src="http://b.vimeocdn.com/ts/235/662/23566238_640.jpg" class="video" )
+        %p spam

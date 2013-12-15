@@ -1,44 +1,137 @@
 .miniwyg
   position relative
+  margin-left -22px
+
+  .bottom
+    border-bottom 1px dashed #ccc
+    margin-left 22px
 
   .editor
     position relative
     background #fff
-    border 1px solid #ccc
-    padding 2px 4px
-    z-index 200
-
-  .panel
+    padding-bottom 8px
     z-index 100
-    opacity 0
-    transition opacity .2s, transform .2s
-    transform translateY(24px)
-    display none
-    &.display
-      display block
-    &.show
-      opacity 1
-      transform translateY(0px)
-    background #ccc
-    border-top-left-radius 2px
-    border-top-right-radius 2px
-    font-size 20px
-    font-family "Times New Roman"
-    &.fontawesome
-      font-size 14px
-      font-family FontAwesome
-    position absolute
-    top -24px
-    u, b, i, span
-      display inline-block
-      text-align center
-      width 24px
-      line-height 24px
-      cursor pointer
-      border-radius 2px
-      &:active, &:hover
-        background #000
-        color #fff
+    font-size 18px
+    line-height 20px
+    padding-left 22px
+    overflow hidden
+    background #eee
 
-.miniwyg_hidden_textarea
+    * + *
+      margin-top 12px
+
+    b, h1, h2, h3
+      font-weight 600
+    
+    h1
+      font-size 36px
+      line-height 40px
+    
+    h2
+      font-size 30px
+      line-height 34px
+    
+    h3
+      font-size 24px
+      line-height 28px
+
+    p
+      background rgba(255, 0, 0, 0.1)
+      min-height 20px
+      &:empty
+        background rgba(0, 255, 0, 0.2)
+
+    p, h1, h2, h3
+      &:before
+        display block
+        content "\f055"
+        font-family FontAwesome
+        position absolute
+        margin-left -22px
+        text-align center
+        opacity 0
+        transition opacity 0.2s
+        font-weight 600
+        font-size 18px
+        line-height 20px
+      &:hover
+        &:before
+          opacity 0.7
+
+    img
+      &.center
+        display block
+        margin 8px auto
+      &.left
+        margin 8px 8px 8px 0
+        float left
+      &.right
+        margin 8px 0 8px 8px
+        float right
+      &.video
+        display block
+        margin 8px auto
+        &.loading
+          content "загружаем обложку"
+
+.miniwyg-insert-popup
+  z-index 300
+  position absolute
+  background rgba(0, 0, 0, 0.8)
+  padding 4px 12px
+  color #ccc
+  font-size 24px
   display none
+  opacity 0
+  transition opacity 0.2s
+  border-radius 2px
+  &.display
+    display block
+  &.show
+    opacity 1
+  span
+    transition color 0.2s
+    cursor pointer
+    &:hover
+      color #fff
+    + span
+      margin-left 4px
+
+.miniwyg-hidden-textarea
+  display none
+
+.miniwyg-panel
+  z-index 200
+  opacity 0
+  transition opacity .2s, transform .2s, left 0.2s, top 0.2s
+  transform translateY(-48px)
+  display none
+  &.display
+    display block
+  &.show
+    opacity 1
+    transform translateY(-24px)
+  background #333
+  color #f3f3f3
+  border-radius 2px
+  font-size 20px
+  font-family "Times New Roman"
+  &.fontawesome
+    font-size 14px
+    font-family FontAwesome
+  position absolute
+  u, b, i, span
+    display inline-block
+    text-align center
+    width 24px
+    line-height 24px
+    cursor pointer
+    border-radius 2px
+    &:active, &:hover
+      background #000
+      color #fff
+
+.miniwyg-panel-image, .miniwyg-panel-video
+  transform translateY(-24px)
+  &.show
+    transform translateY(0px)
