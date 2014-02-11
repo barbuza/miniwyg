@@ -72,6 +72,7 @@ create-miniwyg = !({fontawesome}:options={}) ->
     editor.mousedown !(e) -> e.stop-propagation!
 
     move-images = !->
+      editor.find("img").each -> @contentEditable = no
       editor.find("p img").each -> $(@).parent().before @
 
     remove-linebreaks = !-> editor.find("> br").remove!
@@ -88,12 +89,24 @@ create-miniwyg = !({fontawesome}:options={}) ->
           document.exec-command \formatBlock no \p
       if $.trim(sel.to-string!).length and sel.type != \Control
         rect = sel.get-range-at(0).get-client-rects![0]
-        show-panel left: rect.left, top: rect.top
+        show-panel left: rect.left, top: (rect.top + window.scrollY)
       else
         hide-panel! if panel.has-class \show
       move-images!
       remove-linebreaks!
       remove-spans!
+
+    paste-data = (ev) ->
+      event = ev.original-event
+      if event and event.clipboard-data and event.clipboard-data.getData
+        text = event.clipboard-data.get-data "text/plain"
+        if text.length
+          lines = for let line in text.split(/(\r?\n)/g) when $.trim(line).length
+            "<p>" + $.trim(line).replace(/(<([^>]+)>)/ig, '') + "</p>"
+          for line in lines
+            document.exec-command \InsertParagraph no null
+            document.exec-command \insertHtml no line
+      false
 
     foreach [panel, image-panel, video-panel, insert-panel] (panel) ->
       panel.on \transitionend !->
@@ -103,6 +116,7 @@ create-miniwyg = !({fontawesome}:options={}) ->
       mouseup: !-> deffer check-selection
       keyup: check-selection
       keydown: check-selection
+      paste: paste-data
     }
 
     make-insert-selection = ->
@@ -134,7 +148,7 @@ create-miniwyg = !({fontawesome}:options={}) ->
 
     insert-video = ->
       make-insert-selection.apply @
-      video-url = prompt "Ссылка на youtube или vimeo" unless video-url
+      video-url = prompt "Ссылка на vimeo" unless video-url
       return unless video-url
       uri = URI.parse video-url, yes
       if uri.hostname is "vimeo.com"
@@ -274,7 +288,6 @@ create-miniwyg = !({fontawesome}:options={}) ->
       editor.focus!
 
     check-selection!
-
 
 destroy-miniwyg = !->
   panels = @data \miniwyg-panels
